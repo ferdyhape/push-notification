@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Push Notification Demo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 2em;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+        }
+
+        #status {
+            margin-top: 1em;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Push Notification Demo</h1>
+    <button id="enableNotification">Enable Notifications</button>
+    <div id="status"></div>
+
+    <script>
+        const publicVapidKey = 'BExsNSkVcnXa4i40_BncMYheo3uoYs9fHf92CqjX7f60PoE03i2n3KXaOToFo1B9Py0US6HxbKh16mlgQkjVF08'; // Ganti dengan public key VAPID Anda
+
+        if ('serviceWorker' in navigator) {
+            const statusEl = document.getElementById('status');
+            const enableBtn = document.getElementById('enableNotification');
+
+            enableBtn.addEventListener('click', () => {
+                subscribeUser().catch(err => {
+                    statusEl.textContent = 'Error: ' + err;
+                });
+            });
+
+            async function subscribeUser() {
+                // Register service worker
+                const register = await navigator.serviceWorker.register('worker.js', {
+                    scope: '/'
+                });
+                statusEl.textContent = 'Service Worker registered.';
+
+                // Request permission
+                const permission = await Notification.requestPermission();
+                if (permission !== 'granted') {
+                    statusEl.textContent = 'Permission not granted for notifications';
+                    return;
+                }
+
+                // Subscribe push
+                const subscription = await register.pushManager.subscribe({
+                    userVisibleOnly: true,
+                    applicationServerKey: urlBase64ToUint8Array(publicVapidKey)
+                });
+
+                // Send subscription to server
+                await fetch('save_subscription.php', {
+                    method: 'POST',
+                    body: JSON.stringify(subscription),
+                    headers: {
+                        'content-type': 'application/json'
+                    }
+                });
+
+                statusEl.textContent = 'Subscribed to push notifications.';
+            }
+
+            // Helper function to convert VAPID key
+            function urlBase64ToUint8Array(base64String) {
+                const padding = '='.repeat((4 - base64String.length % 4) % 4);
+                const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+                const rawData = window.atob(base64);
+                const outputArray = new Uint8Array(rawData.length);
+                for (let i = 0; i < rawData.length; ++i) {
+                    outputArray[i] = rawData.charCodeAt(i);
+                }
+                return outputArray;
+            }
+        } else {
+            document.getElementById('status').textContent = 'Service workers are not supported by your browser.';
+        }
+    </script>
+</body>
+
+</html>

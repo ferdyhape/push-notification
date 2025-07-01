@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Send Push Notification</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- jQuery CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"
+        integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <!-- Custom Styles -->
+    <style>
+        body {
+            background-color: #f0f2f5;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .card {
+            border: none;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+            background-color: #fff;
+        }
+
+        .form-control,
+        .btn {
+            border-radius: 12px;
+        }
+
+        .btn-primary {
+            padding: 0.75rem;
+            font-weight: 500;
+            font-size: 16px;
+        }
+
+        .form-label {
+            font-weight: 500;
+        }
+
+        .heading-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        #response {
+            margin-top: 1.5rem;
+        }
+    </style>
+</head>
+
+<body class="d-flex align-items-center justify-content-center vh-100">
+
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6 col-lg-5">
+                <div class="card p-4">
+                    <div class="card-body text-center">
+                        <div class="heading-icon">📢</div>
+                        <h4 class="card-title mb-3">Send Push Notification</h4>
+                        <p class="text-muted mb-4">Compose your notification and send it to all subscribers.</p>
+
+                        <form id="pushForm" class="text-start">
+                            <div class="mb-3">
+                                <label for="title" class="form-label">Notification Title</label>
+                                <input type="text" class="form-control" name="title" id="title"
+                                    placeholder="e.g., New Update Available" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="body" class="form-label">Message</label>
+                                <textarea class="form-control" name="body" id="body" rows="4"
+                                    placeholder="Type your notification message..." required></textarea>
+                            </div>
+                            <div class="mb-4">
+                                <label for="icon" class="form-label">Icon URL (optional)</label>
+                                <input type="text" class="form-control" name="icon" id="icon"
+                                    placeholder="https://img.pikbest.com/origin/10/10/74/87tpIkbEsTgVC.png!bw700">
+                            </div>
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary">🚀 Send Notification</button>
+                            </div>
+                        </form>
+
+                        <div id="response"></div>
+                    </div>
+                </div>
+                <p class="text-center text-muted mt-3 small">Powered by <strong>Hello World!</strong></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap Bundle JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- AJAX Handler -->
+    <script>
+        $('#pushForm').on('submit', function (e) {
+            e.preventDefault();
+            $('#response').html('<div class="alert alert-info">Sending notification...</div>');
+
+            $.ajax({
+                url: 'send_push_with_input.php',
+                method: 'POST',
+                data: $(this).serialize(),
+                success: function (res) {
+                    $('#response').html('<div class="alert alert-success">Notification sent successfully!</div><pre class="text-start small">' + res + '</pre>');
+                },
+                error: function (xhr) {
+                    $('#response').html('<div class="alert alert-danger">Failed to send notification.<br>' + xhr.responseText + '</div>');
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>
