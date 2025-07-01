@@ -1,11 +1,10 @@
 <?php
-require 'vendor/autoload.php';
+require_once __DIR__ . '/../bootstrap.php';
 
 use Minishlink\WebPush\WebPush;
 use Minishlink\WebPush\Subscription;
 
-// Baca semua subscription (sekarang berupa array)
-$subscriptionJson = file_get_contents('subscription.json');
+$subscriptionJson = file_get_contents(__DIR__ . '/../storage/subscription.json');
 if (!$subscriptionJson) {
     die("No subscriptions available\n");
 }
@@ -17,9 +16,9 @@ if (!is_array($subscriptionsArray) || count($subscriptionsArray) === 0) {
 
 $auth = [
     'VAPID' => [
-        "subject" => "mailto:ferdyhahan5@gmail.com",
-        "publicKey" => "BExsNSkVcnXa4i40_BncMYheo3uoYs9fHf92CqjX7f60PoE03i2n3KXaOToFo1B9Py0US6HxbKh16mlgQkjVF08",
-        "privateKey" => "cBuCvNr0KEFxA7H68NoLWl0oIga_GcjeOJR914H3fjg"
+        "subject" => $_ENV['VAPID_SUBJECT'],
+        "publicKey" => $_ENV['VAPID_PUBLIC_KEY'],
+        "privateKey" => $_ENV['VAPID_PRIVATE_KEY']
     ],
 ];
 
@@ -44,12 +43,11 @@ foreach ($subscriptionsArray as $subArray) {
 foreach ($webPush->flush() as $report) {
     $endpoint = $report->getRequest()->getUri()->__toString();
     if ($report->isSuccess()) {
-        echo "Notifikasi berhasil dikirim ke endpoint: {$endpoint}\n";
+        echo "Notification sent successfully to endpoint: {$endpoint}\n";
     } else {
-        echo "Gagal mengirim notifikasi ke endpoint: {$endpoint}\n";
+        echo "Failed to send notification to endpoint: {$endpoint}\n";
         echo "Reason: " . $report->getReason() . "\n";
     }
 }
 
 echo "All notifications processed.\n";
-

@@ -2,8 +2,7 @@
 <?php
 $data = json_decode(file_get_contents('php://input'), true);
 if ($data) {
-    // Baca file subscription jika ada
-    $file = 'subscription.json';
+    $file = __DIR__ . '/../storage/subscription.json';
     $subscriptions = [];
     if (file_exists($file)) {
         $content = file_get_contents($file);
@@ -13,7 +12,6 @@ if ($data) {
         }
     }
 
-    // Tambahkan subscription baru hanya jika belum ada (cek endpoint unik)
     $exists = false;
     foreach ($subscriptions as $sub) {
         if (isset($sub['endpoint']) && $sub['endpoint'] === $data['endpoint']) {

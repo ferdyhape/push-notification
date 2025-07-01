@@ -1,16 +1,15 @@
 <?php
-require 'vendor/autoload.php';
+require_once __DIR__ . '/../bootstrap.php';
 
 use Minishlink\WebPush\WebPush;
 use Minishlink\WebPush\Subscription;
 
-// Ambil data input dari form
 $title = $_POST['title'] ?? 'No Title';
 $body = $_POST['body'] ?? 'No Body';
-$icon = $_POST['icon'] ?? 'notification.png'; // Default icon jika tidak diisi
+$icon = $_POST['icon'] ?? 'assets/images/notification.png';
+$image = $_POST['image'] ?? '';
 
-// Ambil data subscription
-$subscriptionJson = file_get_contents('subscription.json');
+$subscriptionJson = file_get_contents(__DIR__ . '/../storage/subscription.json');
 if (!$subscriptionJson) {
     die("No subscriptions available\n");
 }
@@ -22,9 +21,9 @@ if (!is_array($subscriptionsArray) || count($subscriptionsArray) === 0) {
 
 $auth = [
     'VAPID' => [
-        "subject" => "mailto:ferdyhahan5@gmail.com",
-        "publicKey" => "BExsNSkVcnXa4i40_BncMYheo3uoYs9fHf92CqjX7f60PoE03i2n3KXaOToFo1B9Py0US6HxbKh16mlgQkjVF08",
-        "privateKey" => "cBuCvNr0KEFxA7H68NoLWl0oIga_GcjeOJR914H3fjg"
+        "subject" => $_ENV['VAPID_SUBJECT'],
+        "publicKey" => $_ENV['VAPID_PUBLIC_KEY'],
+        "privateKey" => $_ENV['VAPID_PRIVATE_KEY']
     ],
 ];
 
@@ -32,6 +31,7 @@ $payload = json_encode([
     'title' => $title,
     'body' => $body,
     'icon' => $icon,
+    'image' => $image
 ]);
 
 $webPush = new WebPush($auth);
@@ -45,7 +45,6 @@ foreach ($subscriptionsArray as $subArray) {
     }
 }
 
-// Flush all queued messages
 foreach ($webPush->flush() as $report) {
     $endpoint = $report->getRequest()->getUri()->__toString();
     if ($report->isSuccess()) {

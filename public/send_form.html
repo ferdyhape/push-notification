@@ -54,9 +54,9 @@
     </style>
 </head>
 
-<body class="d-flex align-items-center justify-content-center vh-100">
+<body class="">
 
-    <div class="container">
+    <div class="container my-5">
         <div class="row justify-content-center">
             <div class="col-md-6 col-lg-5">
                 <div class="card p-4">
@@ -77,10 +77,26 @@
                                     placeholder="Type your notification message..." required></textarea>
                             </div>
                             <div class="mb-4">
+                                <label for="image" class="form-label">Image URL (optional)</label>
+                                <input type="text" class="form-control" name="image" id="image"
+                                    placeholder="https://placehold.co/600x300.png?text=Update+Available">
+                                <div class="form-text small mt-1">
+                                    Example: <a href="https://placehold.co/600x300.png?text=Update+Available"
+                                        target="_blank">
+                                        https://placehold.co/600x300.png?text=Update+Available</a>
+                                </div>
+                            </div>
+                            <div class="mb-4">
                                 <label for="icon" class="form-label">Icon URL (optional)</label>
                                 <input type="text" class="form-control" name="icon" id="icon"
-                                    placeholder="https://img.pikbest.com/origin/10/10/74/87tpIkbEsTgVC.png!bw700">
+                                    placeholder="https://pushnotif.ferdyhape.space/assets/images/notification.png">
+                                <div class="form-text small mt-1">
+                                    Example: <a href="https://pushnotif.ferdyhape.space/assets/images/notification.png"
+                                        target="_blank">
+                                        https://pushnotif.ferdyhape.space/assets/images/notification.png</a>
+                                </div>
                             </div>
+
                             <div class="d-grid">
                                 <button type="submit" class="btn btn-primary">🚀 Send Notification</button>
                             </div>
@@ -104,7 +120,7 @@
             $('#response').html('<div class="alert alert-info">Sending notification...</div>');
 
             $.ajax({
-                url: 'send_push_with_input.php',
+                url: 'api/send_push_with_input.php',
                 method: 'POST',
                 data: $(this).serialize(),
                 success: function (res) {
